@@ -195,7 +195,6 @@ To invoke the function, send a **POST** request to the OpenAI Proxy URL with a J
 ```json
     {
         "message": "Tell me a funny joke.",
-        "testOverride": "YOUR_TEST_OVERRIDE",  // Optional, for local testing
         "domainOverride": "YOUR_DOMAIN_OVERRIDE", // Optional, if calling from unlisted domain
     }
 ```
