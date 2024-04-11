@@ -1,4 +1,4 @@
-# Node Email-SMS API
+# Node Email-SMS API + OpenAI Proxy
 Scalable serverless solution for email and SMS integration using Node.js, Firebase Cloud Functions, SMTP, and Twilio. Use this for powering your AI Integration Tools or any messaging function via REST API.
 
 ## Use Cases
@@ -10,25 +10,29 @@ Scalable serverless solution for email and SMS integration using Node.js, Fireba
 6. Emergency Notification
 7. Marketing Promotions and more
 
+A basic OpenAI Proxy is included here for chatbots communicating directly to OpenAI instead of sharing API keys (and messages) to bot service middlemen.
+
 ## Solution Advantage
 ### IT Dollar Economics
 For majority of chatbot use-cases, this integration solution eliminates the need for costly integration subscriptions and messaging costs. It also reduces the number of moving parts improving reliability of your AI-powered solution.
 ### Automatic Scaling
-When the number of requests increases, Firebase Cloud Functions automatically allocates more resources to handle the load. This means that as your app grows in popularity or experiences usage spikes, the functions will scale up to meet the demand without requiring manual intervention. Conversely, it scales down as the demand decreases.
+When the number of requests increases, the platform automatically allocates more resources to handle the load. This means that as your app grows in popularity or experiences usage spikes, the functions will scale up to meet the demand without requiring manual intervention. Conversely, it scales down as the demand decreases.
 
 ## Introduction
 
 This project contains a Firebase Cloud Function that has the following endpoints:
 - **/sendEmail** - sends emails using `nodemailer` and SMTP. It's designed to receive a POST request with a payload containing `name`, `email`, and `message`, and then sends this data by email to a predefined email account.
 - **/sendText** - sends SMS text messages using Twilio through a POST request with a payload containing `phoneNumber` and `smsMessage`
+- **/openaiProxy** - a basic endpoint for communicating directly to OpenAI without sharing your API key to bot service providers.
 
 ## Prerequisites
 
 - Node.js
 - A Firebase project
+- Firebase CLI
 - SMTP server credentials (from your email provider)
 - Twilio account and phone number
-- Firebase CLI
+- OpenAI API key (if using openaiProxy endpoint)
 
 ## Getting Started
 
@@ -56,6 +60,11 @@ This project contains a Firebase Cloud Function that has the following endpoints
     ```
 
 3. **Set Up Firebase**
+
+    Setup Firebase CLI globally:
+    ```bash
+    npm install -g firebase-tools  # if you haven't done so already
+    ```
     
     Initialize Firebase:
 
@@ -101,12 +110,18 @@ firebase functions:config:set sms.twilio_account_sid="YOUR_TWILIO_ACCOUNT_SID" s
 
 Replace YOUR_TWILIO_ACCOUNT_SID, YOUR_TWILIO_AUTH_TOKEN and YOUR_TWILIO_PHONE_NUMBER with your actual Twilio account details.
 
-**NOTE** These credentials can only be read by functions.config() from the environment at runtime. To use the same values for testing, run the following command:
+### OpenAI Proxy
+```bash
+firebase functions:config:set openai.key="YOUR_OPENAI_API_KEY"
+```
+Replace YOUR_OPENAI_API_KEY accordingly.
+
+**NOTE** These credentials can only be read by functions.config() from the environment at runtime. To use the same values for testing locally, run the following command:
 
 ```bash
 firebase functions:config:get > .runtimeconfig.json
 ```
-Make sure you **DO NOT** check-in this file `.runtimeconfig.json` into your repo.
+Make sure you **DO NOT** check-in this file `.runtimeconfig.json` into your repo, as enforced already in the `.gitignore` file.
 
 ## Customization
 1. Using your code editor, modify the entries in `functions/src/helpers/constants/email-constants.ts` to customize your email details:
@@ -132,7 +147,7 @@ Make sure you **DO NOT** check-in this file `.runtimeconfig.json` into your repo
     functions[us-central1-sendText]: http function initialized (http://127.0.0.1:5001/your-project/us-central1/sendText).
     ```
 
-3. Use Postman or equivalent tool. Make sure to use only dummy API keys when testing. Default value is **test123**. You can change this in `functions/src/helpers/validate-request.ts`. See the **Usage** section below for specifics on how to test the function.
+3. Use [Postman](https://www.postman.com/) or equivalent tool. Make sure to use only dummy API keys when testing. Default value is **test123**. You can change this in `functions/src/helpers/validate-request.ts`. See the **Usage** section below for specifics on how to test the function.
 
     **DO NOT** test with production API keys!
 
@@ -173,3 +188,18 @@ To invoke the function, send a **POST** request to the SMS function's URL with a
         "phoneNumber": "+15554443210",
     }
 ```
+
+### OpenAI Proxy
+To invoke the function, send a **POST** request to the OpenAI Proxy URL with a JSON payload below.
+#### Payload
+```json
+    {
+        "message": "Tell me a funny joke.",
+        "testOverride": "YOUR_TEST_OVERRIDE",  // Optional, for local testing
+        "domainOverride": "YOUR_DOMAIN_OVERRIDE", // Optional, if calling from unlisted domain
+    }
+```
+**Note** For listed (authorized) domains, only message is in the payload. This endpoint is good for one-off conversations only, meaning subsequent questions are not answered in the context of previous messages.
+
+## License
+This project is licensed under the MIT License. Feel free to use any way you want. *Pay it forward* encouraged.
