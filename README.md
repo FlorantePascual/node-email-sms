@@ -1,6 +1,8 @@
 # Node Email-SMS API + OpenAI Proxy
 Scalable serverless solution for email and SMS integration using Node.js, Firebase Cloud Functions, SMTP, and Twilio. Use this for powering your AI Integration Tools or any messaging function via REST API.
 
+This repo is a dependency of the [JavaScript AI Chatbot](https://github.com/FlorantePascual/js-ai-chatbot) Tutorial.
+
 ## Use Cases
 1. Acknowledge a Chat Bot conversation with a potential lead
 2. Inform appropriate department of potential Sales Lead
